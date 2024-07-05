@@ -10,15 +10,32 @@ EXCEL_FILE_PATH = 'numbers.xlsx'
 def index():
     return render_template('index.html')
 
+# @app.route('/search', methods=['POST'])
+# def search():
+    # print("err")
+    # data = request.get_json()
+    # number = data.get('number')
+    # if number is not None and search_in_excel(number):
+    #     return jsonify({'message': 'Pass'})
+    # else:
+    # return jsonify({'message': '404 Not Found'})
+
 @app.route('/search', methods=['POST'])
 def search():
     data = request.get_json()
     number = data.get('number')
-    if number is not None and search_in_excel(number):
-        return jsonify({'message': 'Pass'})
+    if number:
+        try:
+            if search_in_excel(number):
+                return jsonify({'message': 'Pass'})
+            else:
+                return jsonify({'message': '404 Not Found'})
+        except Exception as e:
+            print(f"Error in search function: {e}")
+            return jsonify({'message': 'Error processing the request'}), 500
     else:
-        return jsonify({'message': '404 Not Found'})
-
+        return
+print("err2")
 def search_in_excel(number):
     try:
         df = pd.read_excel(EXCEL_FILE_PATH, header=None)
@@ -27,6 +44,7 @@ def search_in_excel(number):
         print(f"Error reading Excel file: {e}")
         return False
 
+print("err3")
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
 
